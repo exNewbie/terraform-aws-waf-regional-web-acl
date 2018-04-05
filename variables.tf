@@ -1,3 +1,7 @@
+variable "aws_region" {
+  type = "string"
+}
+
 variable "SqlInjectionProtectionParam" {
   "type" = "string",
   "default" = "yes",
@@ -37,7 +41,7 @@ variable "ActivateBadBotProtectionParam" {
 variable "AccessLogBucket" {
   "type" = "string",
   "default" = "",
-  "description" = "Enter a name for the Amazon S3 bucket where you want to store Amazon ALB access logs. This can be the name of either an existing S3 bucket, or a new bucket that the template will create during stack launch (if it does not find a matching bucket name). The solution will modify the bucket���s notification configuration to trigger the Log Parser AWS Lambda function whenever a new log file is saved in this bucket. More about bucket name restriction here: http://amzn.to/1p1YlU5"
+  "description" = "(Required) Enter a name for the Amazon S3 bucket where you want to store Amazon ALB access logs. This can be the name of either an existing S3 bucket, or a new bucket that the template will create during stack launch (if it does not find a matching bucket name). The solution will modify the bucket's notification configuration to trigger the Log Parser AWS Lambda function whenever a new log file is saved in this bucket. More about bucket name restriction here: http://amzn.to/1p1YlU5"
 }
 
 variable "SendAnonymousUsageData" {
