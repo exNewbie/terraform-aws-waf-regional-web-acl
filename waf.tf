@@ -2,26 +2,50 @@
 
 resource "aws_wafregional_ipset" "WAFWhitelistSet" {
   name = "WAFWhitelistSet"
+
+  lifecycle {
+    ignore_changes = ["ip_set_descriptor"]
+  }
 }
 
 resource "aws_wafregional_ipset" "WAFBlacklistSet" {
   name = "WAFBlacklistSet"
+
+  lifecycle {
+    ignore_changes = ["ip_set_descriptor"]
+  }
 }
 
 resource "aws_wafregional_ipset" "WAFScansProbesSet" {
   name = "WAFScansProbesSet"
+
+  lifecycle {
+    ignore_changes = ["ip_set_descriptor"]
+  }
 }
 
 resource "aws_wafregional_ipset" "WAFReputationListsSet1" {
   name = "WAFReputationListsSet1"
+
+  lifecycle {
+    ignore_changes = ["ip_set_descriptor"]
+  }
 }
 
 resource "aws_wafregional_ipset" "WAFReputationListsSet2" {
   name = "WAFReputationListsSet2"
+
+  lifecycle {
+    ignore_changes = ["ip_set_descriptor"]
+  }
 }
 
 resource "aws_wafregional_ipset" "WAFBadBotSet" {
   name = "WAFBadBotSet"
+
+  lifecycle {
+    ignore_changes = ["ip_set_descriptor"]
+  }
 }
 
 ### SqlInjectionMatchSet ###
@@ -241,7 +265,7 @@ resource "aws_wafregional_rule" "WAFIPReputationListsRule1" {
 }
 
 resource "aws_wafregional_rule" "WAFIPReputationListsRule2" {
-  name        = "WAFIPReputationListsRule1"
+  name        = "WAFIPReputationListsRule2"
   metric_name = "SecurityAutomationsIPReputationListsRule2"
 
   predicate {
@@ -281,5 +305,23 @@ resource "aws_wafregional_rule" "WAFXssRule" {
     type    = "XssMatch"
     data_id = "${aws_wafregional_xss_match_set.WAFXssDetection.id}"
     negated = false
+  }
+}
+
+resource "aws_wafregional_web_acl" "WAFWebACL" {
+  name        = "WAFWebACL"
+  metric_name = "SecurityAutomationsMaliciousRequesters"
+
+  default_action {
+    type = "ALLOW"
+  }
+
+  rule {
+    action {
+      type = "BLOCK"
+    }
+
+    priority = 10
+    rule_id  = "${aws_wafregional_rule.WAFWhitelistRule.id}"
   }
 }

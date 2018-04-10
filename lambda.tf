@@ -65,6 +65,30 @@ resource "aws_lambda_function" "LambdaWAFBadBotParserFunction" {
   }
 }
 
+resource "aws_lambda_function" "LambdaWAFCustomResourceFunction" {
+  function_name = "LambdaWAFCustomResourceFunction"
+  description   = "This lambda function configures the Web ACL rules based on the features enabled in the CloudFormation template."
+  role          = "${aws_iam_role.LambdaRoleCustomResource.arn}"
+  handler       = "custom-resource.lambda_handler"
+  runtime       = "python2.7"
+  timeout       = "300"
+
+  s3_bucket = "${join("-", list("solutions", var.aws_region))}"
+  s3_key    = "aws-waf-security-automations/v4/custom-resource.zip"
+}
+
+resource "aws_lambda_function" "SolutionHelper" {
+  function_name = "SolutionHelper"
+  description   = "This lambda function executes generic common tasks to support this solution."
+  role          = "${aws_iam_role.SolutionHelperRole.arn}"
+  handler       = "solution-helper.lambda_handler"
+  runtime       = "python2.7"
+  timeout       = "300"
+
+  s3_bucket = "${join("-", list("solutions", var.aws_region))}"
+  s3_key    = "library/solution-helper/v1/solution-helper.zip"
+}
+
 ### Lambda permits services to execute ###
 
 resource "aws_lambda_permission" "LambdaWAFLogParserFunction-Permission" {
@@ -88,5 +112,4 @@ resource "aws_lambda_permission" "LambdaInvokePermissionBadBot-Permission" {
   action        = "lambda:*"
   function_name = "${aws_lambda_function.LambdaWAFBadBotParserFunction.function_name}"
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_cloudwatch_event_rule.LambdaWAFReputationListsParserEventsRule.arn}"
 }
