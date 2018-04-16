@@ -1,5 +1,7 @@
 resource "aws_cloudwatch_event_rule" "LambdaWAFReputationListsParserEventsRule" {
-  name                = "LambdaWAFReputationListsParserEventsRule"
+  count               = "${local.ReputationListsProtectionActivated}"
+  depends_on          = ["aws_lambda_function.LambdaWAFReputationListsParserFunction", "aws_wafregional_ipset.WAFReputationListsSet1", "aws_wafregional_ipset.WAFReputationListsSet2"]
+  name                = "${var.stack_prefix}-LambdaWAFReputationListsParserEventsRule"
   description         = "Security Automations - WAF Reputation Lists"
   schedule_expression = "rate(1 hour)"
 }

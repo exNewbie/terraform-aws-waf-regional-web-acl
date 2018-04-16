@@ -10,6 +10,16 @@ variable "aws_region" {
   type = "string"
 }
 
+variable "stack_prefix" {
+  type        = "string"
+  description = "Stack name"
+}
+
+variable "alb_arn" {
+  type        = "string"
+  description = "ARN of Application Load Balancer"
+}
+
 variable "SqlInjectionProtectionParam" {
   "type"        = "string"
   "default"     = "yes"
@@ -42,13 +52,12 @@ variable "ActivateReputationListsProtectionParam" {
 
 variable "ActivateBadBotProtectionParam" {
   "type"        = "string"
-  "default"     = "yes"
+  "default"     = "no"
   "description" = "Choose yes to enable the component designed to block bad bots and content scrapers. AllowedValues: yes, no"
 }
 
 variable "AccessLogBucket" {
   "type"        = "string"
-  "default"     = ""
   "description" = "(Required) Enter a name for the Amazon S3 bucket where you want to store Amazon ALB access logs. This can be the name of either an existing S3 bucket, or a new bucket that the template will create during stack launch (if it does not find a matching bucket name). The solution will modify the bucket's notification configuration to trigger the Log Parser AWS Lambda function whenever a new log file is saved in this bucket. More about bucket name restriction here: http://amzn.to/1p1YlU5"
 }
 
@@ -76,6 +85,23 @@ variable "WAFBlockPeriod" {
   "description" = "If you chose yes for the Activate Scanners & Probes Protection parameters, enter the period (in minutes) to block applicable IP addresses. If you chose to deactivate this protection, ignore this parameter. MinValue=0"
 }
 
+variable "WAFWhitelistedIPSets" {
+  "type"        = "list"
+  "description" = "List of Whitelisted IP addresses"
+}
+
 ### Data ###
 
 data "aws_caller_identity" "current" {}
+
+### Conditions ###
+
+locals {
+  SqlInjectionProtectionActivated       = "${var.SqlInjectionProtectionParam == "yes" ? 1 : 0}"
+  CrossSiteScriptingProtectionActivated = "${var.CrossSiteScriptingProtectionParam == "yes" ? 1 : 0}"
+  HttpFloodProtectionActivated          = "${var.ActivateHttpFloodProtectionParam == "yes" ? 1 : 0}"
+  ScansProbesProtectionActivated        = "${var.ActivateScansProbesProtectionParam == "yes" ? 1 : 0}"
+  ReputationListsProtectionActivated    = "${var.ActivateReputationListsProtectionParam == "yes" ? 1 : 0}"
+  BadBotProtectionActivated             = "${var.ActivateBadBotProtectionParam == "yes" ? 1 : 0}"
+  LogParserActivated                    = "${var.ActivateScansProbesProtectionParam == "yes" ? 1 : 0}"
+}

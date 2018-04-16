@@ -1,7 +1,8 @@
 ## LambdaRoleLogParser ##
 
 resource "aws_iam_role" "LambdaRoleLogParser" {
-  name = "LambdaRoleLogParser"
+  count = "${local.LogParserActivated}"
+  name  = "${var.stack_prefix}-LambdaRoleLogParser"
 
   assume_role_policy = <<EOF
 {
@@ -22,8 +23,9 @@ EOF
 }
 
 resource "aws_iam_role_policy" "S3Access" {
-  name = "S3Access"
-  role = "${aws_iam_role.LambdaRoleLogParser.id}"
+  count = "${local.LogParserActivated}"
+  name  = "${var.stack_prefix}-S3Access"
+  role  = "${aws_iam_role.LambdaRoleLogParser.id}"
 
   policy = <<EOF
 {
@@ -42,8 +44,9 @@ EOF
 }
 
 resource "aws_iam_role_policy" "S3AccessPut" {
-  name = "S3AccessPut"
-  role = "${aws_iam_role.LambdaRoleLogParser.id}"
+  count = "${local.LogParserActivated}"
+  name  = "${var.stack_prefix}-S3AccessPut"
+  role  = "${aws_iam_role.LambdaRoleLogParser.id}"
 
   policy = <<EOF
 {
@@ -62,8 +65,9 @@ EOF
 }
 
 resource "aws_iam_role_policy" "LambdaRoleLogParser-WAFGetChangeToken" {
-  name = "LambdaRoleLogParser-WAFGetChangeToken"
-  role = "${aws_iam_role.LambdaRoleLogParser.id}"
+  count = "${local.LogParserActivated}"
+  name  = "${var.stack_prefix}-LambdaRoleLogParser-WAFGetChangeToken"
+  role  = "${aws_iam_role.LambdaRoleLogParser.id}"
 
   policy = <<EOF
 {
@@ -71,9 +75,7 @@ resource "aws_iam_role_policy" "LambdaRoleLogParser-WAFGetChangeToken" {
     "Statement": [
         {
             "Effect": "Allow",
-            "Action": [
-                "waf-regional:GetChangeToken"
-            ],
+            "Action": "waf-regional:GetChangeToken",
             "Resource": "*"
         }
     ]
@@ -82,8 +84,9 @@ EOF
 }
 
 resource "aws_iam_role_policy" "LambdaRoleLogParser-WAFGetAndUpdateIPSet" {
-  name = "LambdaRoleLogParser-WAFGetAndUpdateIPSet"
-  role = "${aws_iam_role.LambdaRoleLogParser.id}"
+  count = "${local.LogParserActivated}"
+  name  = "${var.stack_prefix}-LambdaRoleLogParser-WAFGetAndUpdateIPSet"
+  role  = "${aws_iam_role.LambdaRoleLogParser.id}"
 
   policy = <<EOF
 {
@@ -97,7 +100,8 @@ resource "aws_iam_role_policy" "LambdaRoleLogParser-WAFGetAndUpdateIPSet" {
             ],
             "Resource": [
               "arn:aws:waf-regional:${var.aws_region}:${data.aws_caller_identity.current.account_id}:ipset/${aws_wafregional_ipset.WAFBlacklistSet.id}",
-              "arn:aws:waf-regional:${var.aws_region}:${data.aws_caller_identity.current.account_id}:ipset/${aws_wafregional_ipset.WAFScansProbesSet.id}"
+              "arn:aws:waf-regional:${var.aws_region}:${data.aws_caller_identity.current.account_id}:ipset/${aws_wafregional_ipset.WAFScansProbesSet.id}",
+              "arn:aws:waf-regional:${var.aws_region}:${data.aws_caller_identity.current.account_id}:ipset/${aws_wafregional_ipset.WAFHttpFloodSet.id}"
             ]
         }
     ]
@@ -106,8 +110,9 @@ EOF
 }
 
 resource "aws_iam_role_policy" "LambdaRoleLogParser-LogsAccess" {
-  name = "LambdaRoleLogParser-LogsAccess"
-  role = "${aws_iam_role.LambdaRoleLogParser.id}"
+  count = "${local.LogParserActivated}"
+  name  = "${var.stack_prefix}-LambdaRoleLogParser-LogsAccess"
+  role  = "${aws_iam_role.LambdaRoleLogParser.id}"
 
   policy = <<EOF
 {
@@ -128,8 +133,9 @@ EOF
 }
 
 resource "aws_iam_role_policy" "LambdaRoleLogParser-CloudWatchAccess" {
-  name = "LambdaRoleLogParser-CloudWatchAccess"
-  role = "${aws_iam_role.LambdaRoleLogParser.id}"
+  count = "${local.LogParserActivated}"
+  name  = "${var.stack_prefix}-LambdaRoleLogParser-CloudWatchAccess"
+  role  = "${aws_iam_role.LambdaRoleLogParser.id}"
 
   policy = <<EOF
 {
@@ -148,7 +154,8 @@ EOF
 ## LambdaRoleReputationListsParser ##
 
 resource "aws_iam_role" "LambdaRoleReputationListsParser" {
-  name = "LambdaRoleReputationListsParser"
+  count = "${local.ReputationListsProtectionActivated}"
+  name  = "${var.stack_prefix}-LambdaRoleReputationListsParser"
 
   assume_role_policy = <<EOF
 {
@@ -169,8 +176,9 @@ EOF
 }
 
 resource "aws_iam_role_policy" "CloudWatchLogs" {
-  name = "CloudWatchLogs"
-  role = "${aws_iam_role.LambdaRoleReputationListsParser.id}"
+  count = "${local.ReputationListsProtectionActivated}"
+  name  = "${var.stack_prefix}-CloudWatchLogs"
+  role  = "${aws_iam_role.LambdaRoleReputationListsParser.id}"
 
   policy = <<EOF
 {
@@ -191,8 +199,9 @@ EOF
 }
 
 resource "aws_iam_role_policy" "LambdaRoleReputationListsParser-WAFGetChangeToken" {
-  name = "LambdaRoleReputationListsParser-WAFGetChangeToken"
-  role = "${aws_iam_role.LambdaRoleReputationListsParser.id}"
+  count = "${local.ReputationListsProtectionActivated}"
+  name  = "${var.stack_prefix}-LambdaRoleReputationListsParser-WAFGetChangeToken"
+  role  = "${aws_iam_role.LambdaRoleReputationListsParser.id}"
 
   policy = <<EOF
 {
@@ -209,8 +218,9 @@ EOF
 }
 
 resource "aws_iam_role_policy" "LambdaRoleReputationListsParser-WAFGetAndUpdateIPSet" {
-  name = "LambdaRoleReputationListsParser-WAFGetAndUpdateIPSet"
-  role = "${aws_iam_role.LambdaRoleReputationListsParser.id}"
+  count = "${local.ReputationListsProtectionActivated}"
+  name  = "${var.stack_prefix}-LambdaRoleReputationListsParser-WAFGetAndUpdateIPSet"
+  role  = "${aws_iam_role.LambdaRoleReputationListsParser.id}"
 
   policy = <<EOF
 {
@@ -233,8 +243,9 @@ EOF
 }
 
 resource "aws_iam_role_policy" "LambdaRoleLogParser-CloudFormationAccess" {
-  name = "LambdaRoleLogParser-CloudFormationAccess"
-  role = "${aws_iam_role.LambdaRoleReputationListsParser.id}"
+  count = "${local.ReputationListsProtectionActivated}"
+  name  = "${var.stack_prefix}-LambdaRoleLogParser-CloudFormationAccess"
+  role  = "${aws_iam_role.LambdaRoleReputationListsParser.id}"
 
   policy = <<EOF
 {
@@ -251,8 +262,9 @@ EOF
 }
 
 resource "aws_iam_role_policy" "LambdaRoleReputationListsParser-CloudWatchAccess" {
-  name = "LambdaRoleReputationListsParser-CloudWatchAccess"
-  role = "${aws_iam_role.LambdaRoleReputationListsParser.id}"
+  count = "${local.ReputationListsProtectionActivated}"
+  name  = "${var.stack_prefix}-LambdaRoleReputationListsParser-CloudWatchAccess"
+  role  = "${aws_iam_role.LambdaRoleReputationListsParser.id}"
 
   policy = <<EOF
 {
@@ -271,7 +283,8 @@ EOF
 ## LambdaRoleBadBot ##
 
 resource "aws_iam_role" "LambdaRoleBadBot" {
-  name = "LambdaRoleBadBot"
+  count = "${local.BadBotProtectionActivated}"
+  name  = "${var.stack_prefix}-LambdaRoleBadBot"
 
   assume_role_policy = <<EOF
 {
@@ -292,8 +305,9 @@ EOF
 }
 
 resource "aws_iam_role_policy" "LambdaRoleBadBot-WAFGetChangeToken" {
-  name = "LambdaRoleBadBot-WAFGetChangeToken"
-  role = "${aws_iam_role.LambdaRoleBadBot.id}"
+  count = "${local.BadBotProtectionActivated}"
+  name  = "${var.stack_prefix}-LambdaRoleBadBot-WAFGetChangeToken"
+  role  = "${aws_iam_role.LambdaRoleBadBot.id}"
 
   policy = <<EOF
 {
@@ -310,8 +324,9 @@ EOF
 }
 
 resource "aws_iam_role_policy" "LambdaRoleBadBot-WAFGetAndUpdateIPSet" {
-  name = "LambdaRoleBadBot-WAFGetAndUpdateIPSet"
-  role = "${aws_iam_role.LambdaRoleBadBot.id}"
+  count = "${local.BadBotProtectionActivated}"
+  name  = "${var.stack_prefix}-LambdaRoleBadBot-WAFGetAndUpdateIPSet"
+  role  = "${aws_iam_role.LambdaRoleBadBot.id}"
 
   policy = <<EOF
 {
@@ -331,8 +346,9 @@ EOF
 }
 
 resource "aws_iam_role_policy" "LambdaRoleBadBot-LogsAccess" {
-  name = "LambdaRoleBadBot-LogsAccess"
-  role = "${aws_iam_role.LambdaRoleBadBot.id}"
+  count = "${local.BadBotProtectionActivated}"
+  name  = "${var.stack_prefix}-LambdaRoleBadBot-LogsAccess"
+  role  = "${aws_iam_role.LambdaRoleBadBot.id}"
 
   policy = <<EOF
 {
@@ -353,8 +369,9 @@ EOF
 }
 
 resource "aws_iam_role_policy" "LambdaRoleBadBot-CloudFormationAccess" {
-  name = "LambdaRoleBadBot-CloudFormationAccess"
-  role = "${aws_iam_role.LambdaRoleBadBot.id}"
+  count = "${local.BadBotProtectionActivated}"
+  name  = "${var.stack_prefix}-LambdaRoleBadBot-CloudFormationAccess"
+  role  = "${aws_iam_role.LambdaRoleBadBot.id}"
 
   policy = <<EOF
 {
@@ -371,8 +388,9 @@ EOF
 }
 
 resource "aws_iam_role_policy" "LambdaRoleBadBot-CloudWatchAccess" {
-  name = "LambdaRoleBadBot-CloudWatchAccess"
-  role = "${aws_iam_role.LambdaRoleBadBot.id}"
+  count = "${local.BadBotProtectionActivated}"
+  name  = "${var.stack_prefix}-LambdaRoleBadBot-CloudWatchAccess"
+  role  = "${aws_iam_role.LambdaRoleBadBot.id}"
 
   policy = <<EOF
 {
@@ -392,8 +410,7 @@ EOF
 
 resource "aws_iam_role" "LambdaRoleCustomResource" {
   depends_on = ["aws_wafregional_web_acl.WAFWebACL"]
-
-  name = "LambdaRoleCustomResource"
+  name       = "${var.stack_prefix}-LambdaRoleCustomResource"
 
   assume_role_policy = <<EOF
 {
@@ -414,7 +431,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "LambdaRoleCustomResource-S3Access" {
-  name = "LambdaRoleCustomResource-S3Access"
+  name = "${var.stack_prefix}-LambdaRoleCustomResource-S3Access"
   role = "${aws_iam_role.LambdaRoleCustomResource.id}"
 
   policy = <<EOF
@@ -431,7 +448,26 @@ resource "aws_iam_role_policy" "LambdaRoleCustomResource-S3Access" {
                 "s3:ListBucket",
                 "s3:PutBucketNotification"
             ],
-            "Resource": "arn:aws:s3:::${var.AccessLogBucket}/*"
+            "Resource": "arn:aws:s3:::${var.AccessLogBucket}"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "LambdaRoleCustomResource-LambdaAccess" {
+  count = "${local.ReputationListsProtectionActivated}"
+  name  = "${var.stack_prefix}-LambdaRoleCustomResource-LambdaAccess"
+  role  = "${aws_iam_role.LambdaRoleCustomResource.id}"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "lambda:InvokeFunction",
+            "Resource": "${aws_lambda_function.LambdaWAFReputationListsParserFunction.arn}"
         }
     ]
 }
@@ -439,7 +475,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "LambdaRoleCustomResource-WAFAccess" {
-  name = "LambdaRoleCustomResource-WAFAccess"
+  name = "${var.stack_prefix}-LambdaRoleCustomResource-WAFAccess"
   role = "${aws_iam_role.LambdaRoleCustomResource.id}"
 
   policy = <<EOF
@@ -460,7 +496,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "LambdaRoleCustomResource-WAFRuleAccess" {
-  name = "LambdaRoleCustomResource-WAFRuleAccess"
+  name = "${var.stack_prefix}-LambdaRoleCustomResource-WAFRuleAccess"
   role = "${aws_iam_role.LambdaRoleCustomResource.id}"
 
   policy = <<EOF
@@ -483,7 +519,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "LambdaRoleCustomResource-WAFIPSetAccess" {
-  name = "LambdaRoleCustomResource-WAFIPSetAccess"
+  name = "${var.stack_prefix}-LambdaRoleCustomResource-WAFIPSetAccess"
   role = "${aws_iam_role.LambdaRoleCustomResource.id}"
 
   policy = <<EOF
@@ -504,7 +540,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "LambdaRoleCustomResource-WAFRateBasedRuleAccess" {
-  name = "LambdaRoleCustomResource-WAFRateBasedRuleAccess"
+  name = "${var.stack_prefix}-LambdaRoleCustomResource-WAFRateBasedRuleAccess"
   role = "${aws_iam_role.LambdaRoleCustomResource.id}"
 
   policy = <<EOF
@@ -528,7 +564,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "LambdaRoleCustomResource-CloudFormationAccess" {
-  name = "LambdaRoleCustomResource-CloudFormationAccess"
+  name = "${var.stack_prefix}-LambdaRoleCustomResource-CloudFormationAccess"
   role = "${aws_iam_role.LambdaRoleCustomResource.id}"
 
   policy = <<EOF
@@ -546,7 +582,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "LambdaRoleCustomResource-WAFGetChangeToken" {
-  name = "LambdaRoleCustomResource-WAFGetChangeToken"
+  name = "${var.stack_prefix}-LambdaRoleCustomResource-WAFGetChangeToken"
   role = "${aws_iam_role.LambdaRoleCustomResource.id}"
 
   policy = <<EOF
@@ -564,7 +600,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "LambdaRoleCustomResource-LogsAccess" {
-  name = "LambdaRoleCustomResource-LogsAccess"
+  name = "${var.stack_prefix}-LambdaRoleCustomResource-LogsAccess"
   role = "${aws_iam_role.LambdaRoleCustomResource.id}"
 
   policy = <<EOF
@@ -585,32 +621,10 @@ resource "aws_iam_role_policy" "LambdaRoleCustomResource-LogsAccess" {
 EOF
 }
 
-resource "aws_iam_role_policy" "LambdaRoleCustomResource-LambdaAccess" {
-  name = "LambdaRoleCustomResource-LambdaAccess"
-  role = "${aws_iam_role.LambdaRoleCustomResource.id}"
-
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-              "logs:CreateLogGroup", 
-              "logs:CreateLogStream", 
-              "logs:PutLogEvents"
-            ],
-            "Resource": "${aws_lambda_function.LambdaWAFReputationListsParserFunction.arn}"
-        }
-    ]
-}
-EOF
-}
-
 ## SolutionHelperRole ##
 
 resource "aws_iam_role" "SolutionHelperRole" {
-  name = "SolutionHelperRole"
+  name = "${var.stack_prefix}-SolutionHelperRole"
 
   assume_role_policy = <<EOF
 {
@@ -631,7 +645,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "SolutionHelperRole-Solution_Helper_Permissions" {
-  name = "LambdaRoleCustomResource-Solution_Helper_Permissions"
+  name = "${var.stack_prefix}-LambdaRoleCustomResource-Solution_Helper_Permissions"
   role = "${aws_iam_role.SolutionHelperRole.id}"
 
   policy = <<EOF
