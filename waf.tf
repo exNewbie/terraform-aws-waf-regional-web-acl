@@ -443,6 +443,7 @@ resource "aws_wafregional_web_acl" "WAFWebACL" {
 
 resource "aws_wafregional_web_acl_association" "WAFWebACL-Association" {
   depends_on   = ["aws_wafregional_web_acl.WAFWebACL"]
-  resource_arn = "${var.alb_arn}"
+  count        = "${length(var.alb_arn)}"
+  resource_arn = "${element(var.alb_arn, count.index)}"
   web_acl_id   = "${aws_wafregional_web_acl.WAFWebACL.id}"
 }

@@ -1,9 +1,3 @@
-### Local variables ###
-locals {
-  # locals are visible only within the module where they are defined
-  CreateUniqueID = "${uuid()}"
-}
-
 ### Variables ###
 
 variable "aws_region" {
@@ -16,7 +10,7 @@ variable "stack_prefix" {
 }
 
 variable "alb_arn" {
-  type        = "string"
+  type        = "list"
   description = "ARN of Application Load Balancer"
 }
 
@@ -93,6 +87,11 @@ variable "WAFWhitelistedIPSets" {
 ### Data ###
 
 data "aws_caller_identity" "current" {}
+
+resource "random_string" "UniqueID" {
+  length  = 32
+  special = false
+}
 
 ### Conditions ###
 

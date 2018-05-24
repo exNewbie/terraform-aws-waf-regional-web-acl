@@ -20,7 +20,7 @@ resource "aws_lambda_function" "LambdaWAFLogParserFunction" {
       BLACKLIST_BLOCK_PERIOD                         = "${var.WAFBlockPeriod}"
       ERROR_PER_MINUTE_LIMIT                         = "${var.ErrorThreshold}"
       SEND_ANONYMOUS_USAGE_DATA                      = "${var.SendAnonymousUsageData}"
-      UUID                                           = "${local.CreateUniqueID}"
+      UUID                                           = "${random_string.UniqueID.result}"
       LIMIT_IP_ADDRESS_RANGES_PER_IP_MATCH_CONDITION = "10000"
       MAX_AGE_TO_UPDATE                              = "30"
       REGION                                         = "${var.aws_region}"
@@ -45,7 +45,7 @@ resource "aws_lambda_function" "LambdaWAFReputationListsParserFunction" {
   environment {
     variables = {
       SEND_ANONYMOUS_USAGE_DATA = "${var.SendAnonymousUsageData}"
-      UUID                      = "${local.CreateUniqueID}"
+      UUID                      = "${random_string.UniqueID.result}"
     }
   }
 }
@@ -68,7 +68,7 @@ resource "aws_lambda_function" "LambdaWAFBadBotParserFunction" {
     variables = {
       IP_SET_ID_BAD_BOT         = "${aws_wafregional_ipset.WAFBadBotSet.id}"
       SEND_ANONYMOUS_USAGE_DATA = "${var.SendAnonymousUsageData}"
-      UUID                      = "${local.CreateUniqueID}"
+      UUID                      = "${random_string.UniqueID.result}"
       REGION                    = "${var.aws_region}"
       LOG_TYPE                  = "alb"
     }
